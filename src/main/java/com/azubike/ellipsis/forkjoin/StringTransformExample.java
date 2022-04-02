@@ -5,12 +5,13 @@ import com.azubike.ellipsis.utils.DataSet;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.azubike.ellipsis.utils.CommonUtil.delay;
 import static com.azubike.ellipsis.utils.CommonUtil.stopWatch;
 import static com.azubike.ellipsis.utils.LoggerUtil.log;
 
 public class StringTransformExample {
 
-  public static void main(String[] args) { 
+  public static void main(String[] args) {
 
     stopWatch.start();
     List<String> resultList = new ArrayList<>();
@@ -28,6 +29,7 @@ public class StringTransformExample {
   }
 
   private static String addNameLengthTransform(String name) {
+    delay(500);
     return name.length() + " - " + name;
   }
 }

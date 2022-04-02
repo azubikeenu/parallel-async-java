@@ -8,6 +8,7 @@ import java.util.concurrent.RecursiveTask;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.azubike.ellipsis.utils.CommonUtil.delay;
 import static com.azubike.ellipsis.utils.CommonUtil.stopWatch;
 import static com.azubike.ellipsis.utils.LoggerUtil.log;
 
@@ -37,6 +38,7 @@ public class ForkJoinUsingRecursion extends RecursiveTask<List<String>> {
   }
 
   private static String addNameLengthTransform(String name) {
+    delay(500);
     return name.length() + " - " + name.toUpperCase();
   }
 
