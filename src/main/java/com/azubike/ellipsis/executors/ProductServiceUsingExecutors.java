@@ -1,39 +1,51 @@
-package com.azubike.ellipsis.services;
+package com.azubike.ellipsis.executors;
 
 import com.azubike.ellipsis.domain.Product;
 import com.azubike.ellipsis.domain.ProductInfo;
 import com.azubike.ellipsis.domain.Review;
+import com.azubike.ellipsis.services.ProductInfoService;
+import com.azubike.ellipsis.services.ReviewService;
+
+import java.util.concurrent.*;
 
 import static com.azubike.ellipsis.utils.CommonUtil.stopWatch;
 import static com.azubike.ellipsis.utils.LoggerUtil.log;
 
-public class ProductService {
+public class ProductServiceUsingExecutors {
+  static ExecutorService executorService =
+      Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
   private ProductInfoService productInfoService;
   private ReviewService reviewService;
 
-  public ProductService(ProductInfoService productInfoService, ReviewService reviewService) {
+  public ProductServiceUsingExecutors(
+      ProductInfoService productInfoService, ReviewService reviewService) {
     this.productInfoService = productInfoService;
     this.reviewService = reviewService;
   }
 
-  public Product retrieveProductDetails(String productId) {
+  public Product retrieveProductDetails(String productId)
+      throws ExecutionException, InterruptedException, TimeoutException {
     stopWatch.start();
-
-    ProductInfo productInfo = productInfoService.retrieveProductInfo(productId); // blocking call
-    Review review = reviewService.retrieveReviews(productId); // blocking call
-
+    final Future<ProductInfo> productInfoFuture =
+        executorService.submit(() -> productInfoService.retrieveProductInfo(productId));
+    final Future<Review> reviewFuture =
+        executorService.submit(() -> reviewService.retrieveReviews(productId));
+    final ProductInfo productInfo = productInfoFuture.get(2, TimeUnit.SECONDS);
+    final Review review = reviewFuture.get(2, TimeUnit.SECONDS);
     stopWatch.stop();
     log("Total Time Taken : " + stopWatch.getTime());
     return new Product(productId, productInfo, review);
   }
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws InterruptedException, ExecutionException, TimeoutException {
 
     ProductInfoService productInfoService = new ProductInfoService();
     ReviewService reviewService = new ReviewService();
-    ProductService productService = new ProductService(productInfoService, reviewService);
+    ProductServiceUsingExecutors productService =
+        new ProductServiceUsingExecutors(productInfoService, reviewService);
     String productId = "ABC123";
     Product product = productService.retrieveProductDetails(productId);
     log("Product is " + product);
+    executorService.shutdown();
   }
 }
