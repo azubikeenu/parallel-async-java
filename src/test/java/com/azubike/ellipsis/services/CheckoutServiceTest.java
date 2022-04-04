@@ -7,6 +7,7 @@ import com.azubike.ellipsis.utils.DataSet;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CheckoutServiceTest {
   PriceValidatorService priceValidatorService = new PriceValidatorService();
@@ -22,6 +23,7 @@ class CheckoutServiceTest {
     final Cart cart = DataSet.createCart(6);
     final CheckoutResponse checkout = checkoutService.checkout(cart);
     assertEquals(CheckoutStatus.SUCCESS, checkout.getCheckoutStatus());
+    assertTrue(checkout.getFinalRate() > 0);
   }
 
   @Test

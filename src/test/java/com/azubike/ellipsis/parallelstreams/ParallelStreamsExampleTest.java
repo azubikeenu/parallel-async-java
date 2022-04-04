@@ -22,6 +22,7 @@ class ParallelStreamsExampleTest {
     final List<String> result = parallelStreamsExample.stringTransform(input);
     timeTaken();
     assertEquals(4, result.size());
+
     result.forEach(
         name -> {
           assertTrue(name.contains("-"));
