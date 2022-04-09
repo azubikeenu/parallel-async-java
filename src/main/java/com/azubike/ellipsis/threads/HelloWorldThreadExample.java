@@ -17,8 +17,8 @@ public class HelloWorldThreadExample {
 
   public static void main(String[] args) throws InterruptedException {
 
-    Thread helloThread = new Thread(() -> hello());
-    Thread worldThread = new Thread(() -> world());
+    Thread helloThread = new Thread(HelloWorldThreadExample::hello);
+    Thread worldThread = new Thread(HelloWorldThreadExample::hello);
 
     // Starting the thread
     helloThread.start();

@@ -9,6 +9,7 @@ import static com.azubike.ellipsis.utils.CommonUtil.timeTaken;
 
 public class ParallelStreamPerformance {
   public int sumUsingIntStream(int count, boolean isParallel) {
+
     startTimer();
     final IntStream intStream = IntStream.rangeClosed(0, count);
     if (isParallel) intStream.parallel();
