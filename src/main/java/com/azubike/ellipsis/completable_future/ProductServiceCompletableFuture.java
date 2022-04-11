@@ -35,6 +35,7 @@ public class ProductServiceCompletableFuture {
 
   public Product retrieveProductDetails(String productId) {
     stopWatch.start();
+
     final CompletableFuture<ProductInfo> productInfoCompletableFuture =
         CompletableFuture.supplyAsync(() -> productInfoService.retrieveProductInfo(productId));
     final CompletableFuture<Review> reviewCompletableFuture =
@@ -91,16 +92,17 @@ public class ProductServiceCompletableFuture {
   }
 
   public Product retrieveProductDetails_withInventory_approach_2(String productId) {
-    stopWatch.start();
-    final CompletableFuture<ProductInfo> productInfoCompletableFuture =
-            CompletableFuture.supplyAsync(() -> productInfoService.retrieveProductInfo(productId))
-                    .thenApply(
-                            productInfo -> {
-                                final List<ProductOption> productOptionList =
-                                        updateProductInfo_Approach_2(productInfo);
-                                productInfo.setProductOptions(productOptionList);
-                                return productInfo;
-                            });
+      stopWatch.start();
+
+      final CompletableFuture<ProductInfo> productInfoCompletableFuture =
+              CompletableFuture.supplyAsync(() -> productInfoService.retrieveProductInfo(productId))
+                      .thenApply(
+                              productInfo -> {
+                                  final List<ProductOption> productOptionList =
+                                          updateProductInfo_Approach_2(productInfo);
+                                  productInfo.setProductOptions(productOptionList);
+                                  return productInfo;
+                              });
       final CompletableFuture<Review> reviewCompletableFuture =
               CompletableFuture.supplyAsync(() -> reviewService.retrieveReviews(productId))
                       .exceptionally(
@@ -108,19 +110,18 @@ public class ProductServiceCompletableFuture {
                                   log("Handled Exception in the reviewService " + ex.getMessage());
                                   return Review.builder().noOfReviews(0).overallRating(0.0).build();
                               });
-
-    final Product product =
-            productInfoCompletableFuture
-                    .thenCombine(
-                            reviewCompletableFuture,
-                            (productInfo, review) -> new Product(productId, productInfo, review))
-                    .whenComplete(
-                            (res, ex) -> {
-                                if (ex != null) {
-                                    log("When complete Exception " + ex.getMessage());
-                                }
-                            })
-            .join();
+      final Product product =
+              productInfoCompletableFuture
+                      .thenCombine(
+                              reviewCompletableFuture,
+                              (productInfo, review) -> new Product(productId, productInfo, review))
+                      .whenComplete(
+                              (res, ex) -> {
+                                  if (ex != null) {
+                                      log("When complete Exception " + ex.getMessage());
+                                  }
+                              })
+                      .join();
     timeTaken();
     return product;
   }
